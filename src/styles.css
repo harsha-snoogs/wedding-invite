@@ -1,0 +1,1132 @@
+/* Snegha & Ashwin — scroll film + invitation */
+
+:root {
+  /* Full-screen backgrounds use deep maroon rather than flat black (traditional wedding
+     colours); black stays only in small touches like the shading behind text. */
+  --bg: #3e0d16;
+  --stone: #f5f1eb;
+  --gold: #c2a36b;
+  --gold-light: #e4d4b1;
+  --muted: rgba(245, 241, 235, 0.68);
+  --hair: rgba(194, 163, 107, 0.22);
+
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background: var(--bg);
+  /* Keep room for the scrollbar even while the cover locks scrolling, so opening the
+     invitation doesn't shift the layout. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  background: var(--bg);
+  color: var(--stone);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------------------------------------------------------------- film */
+
+#film-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh; /* stays put while mobile browser bars collapse */
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Edge fades: solid at the very edge (so the browser reads their colour for its bars),
+   melting into the photo within a few pixels. Colours are set live by BrowserTint.js. */
+.edge-tint {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-color: var(--bg);
+}
+
+.edge-tint.top {
+  top: 0;
+  height: calc(22px + var(--safe-top));
+  -webkit-mask-image: linear-gradient(to bottom, #000 var(--safe-top), transparent);
+  mask-image: linear-gradient(to bottom, #000 var(--safe-top), transparent);
+}
+
+.edge-tint.bottom {
+  bottom: 0;
+  height: calc(22px + var(--safe-bottom));
+  -webkit-mask-image: linear-gradient(to top, #000 var(--safe-bottom), transparent);
+  mask-image: linear-gradient(to top, #000 var(--safe-bottom), transparent);
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+#film {
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------- words on film */
+
+.film-text {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s ease 0.2s;
+}
+
+.is-ready .film-text {
+  opacity: 1;
+}
+
+.ov {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 0 24px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(0, var(--drift, 0px), 0);
+  will-change: opacity, transform;
+  /* Layered: a tight edge for crispness plus a soft glow, so words lift off busy photos. */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), 0 2px 12px rgba(0, 0, 0, 0.45), 0 0 34px rgba(0, 0, 0, 0.35);
+}
+
+/* Soft shade behind the words so they read over any photo - no boxes. */
+.ov::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ov-title {
+  top: calc(var(--safe-top) + 11vh);
+}
+
+.ov-title::before {
+  top: calc(-11vh - var(--safe-top));
+  height: 52vh;
+  background:
+    radial-gradient(ellipse 85% 50% at 50% 40%, rgba(10, 8, 6, 0.42), rgba(10, 8, 6, 0) 72%),
+    linear-gradient(to bottom, rgba(10, 8, 6, 0.66), rgba(10, 8, 6, 0.3) 55%, rgba(10, 8, 6, 0));
+}
+
+/* Names in the last scene sit at the top, mirroring the opening title. */
+.ov-wed {
+  top: calc(var(--safe-top) + 12vh);
+}
+
+.ov-wed::before {
+  top: calc(-12vh - var(--safe-top));
+  height: 52vh;
+  background:
+    radial-gradient(ellipse 85% 50% at 50% 40%, rgba(10, 8, 6, 0.38), rgba(10, 8, 6, 0) 72%),
+    linear-gradient(to bottom, rgba(10, 8, 6, 0.55), rgba(10, 8, 6, 0.22) 55%, rgba(10, 8, 6, 0));
+}
+
+.ov-eyebrow {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: #f1e3c3;
+  margin-bottom: 14px;
+}
+
+.ov-names {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(2.7rem, 12vw, 5.6rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: #f6ecd8;
+}
+
+.ov-names em {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.62em;
+  color: var(--gold);
+  margin: 0 0.08em;
+}
+
+.ov-date {
+  margin-top: 16px;
+  font-size: 0.74rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: rgba(245, 241, 235, 0.95);
+}
+
+/* Journey notes - small captions, lower left, like subtitles in a film. */
+.ov-note {
+  bottom: calc(var(--safe-bottom) + 78px);
+  padding: 0 max(28px, 6vw);
+  text-align: left;
+}
+
+.ov-note::before {
+  bottom: calc(-78px - var(--safe-bottom));
+  height: 46vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 24% 70%, rgba(10, 8, 6, 0.45), rgba(10, 8, 6, 0) 72%),
+    linear-gradient(to top, rgba(10, 8, 6, 0.76), rgba(10, 8, 6, 0.34) 55%, rgba(10, 8, 6, 0));
+}
+
+.note-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 0.64rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #f1e3c3;
+}
+
+.note-label::before {
+  content: '';
+  width: 30px;
+  height: 1px;
+  background: var(--gold);
+  transform-origin: left;
+  transform: scaleX(var(--in, 1));
+}
+
+.note-text {
+  max-width: 15em;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 5.8vw, 2.2rem);
+  line-height: 1.22;
+  color: #f6ecd8;
+}
+
+.ov-cue {
+  bottom: calc(var(--safe-bottom) + 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.64rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 235, 0.8);
+}
+
+.ov-cue i {
+  display: block;
+  width: 1px;
+  height: 42px;
+  background: linear-gradient(to bottom, rgba(228, 212, 177, 0), rgba(228, 212, 177, 0.9));
+  transform-origin: top;
+  animation: cue 2.2s cubic-bezier(0.6, 0, 0.3, 1) infinite;
+}
+
+@keyframes cue {
+  0% { transform: scaleY(0); opacity: 1; }
+  60% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+/* ---------------------------------------------------------------- chrome */
+
+.chrome-top {
+  position: fixed;
+  top: calc(var(--safe-top) + 14px);
+  left: 22px;
+  right: 16px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.chrome-top > * {
+  pointer-events: auto;
+}
+
+.music-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px 8px 12px;
+  font: inherit;
+  font-size: 0.64rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  background: rgba(13, 11, 9, 0.42);
+  border: 1px solid rgba(194, 163, 107, 0.3);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.music-btn:hover {
+  border-color: var(--gold);
+}
+
+.music-btn[aria-pressed='true'] {
+  background: rgba(194, 163, 107, 0.16);
+  border-color: rgba(194, 163, 107, 0.6);
+}
+
+.music-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 11px;
+}
+
+.music-bars i {
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: bottom;
+  transform: scaleY(0.3);
+  transition: transform 0.4s ease;
+}
+
+/* Resting, the bars sit like a paused equaliser; playing, they sway. */
+.music-bars i:nth-child(2) { transform: scaleY(0.6); }
+.music-bars i:nth-child(3) { transform: scaleY(0.4); }
+.music-bars i:nth-child(4) { transform: scaleY(0.7); }
+
+.music-btn[aria-pressed='true'] .music-bars i {
+  animation: sway 1.1s ease-in-out infinite alternate;
+}
+.music-btn[aria-pressed='true'] .music-bars i:nth-child(2) { animation-delay: -0.45s; }
+.music-btn[aria-pressed='true'] .music-bars i:nth-child(3) { animation-delay: -0.8s; }
+.music-btn[aria-pressed='true'] .music-bars i:nth-child(4) { animation-delay: -0.2s; }
+
+@keyframes sway {
+  from { transform: scaleY(0.25); }
+  to { transform: scaleY(1); }
+}
+
+.mono {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: var(--gold-light);
+  text-decoration: none;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+}
+
+.chrome-bottom {
+  transition: opacity 0.5s ease;
+}
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 4;
+  background: rgba(245, 241, 235, 0.08);
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(to right, rgba(194, 163, 107, 0.5), var(--gold-light));
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.skip {
+  position: fixed;
+  right: 20px;
+  bottom: calc(var(--safe-bottom) + 20px);
+  z-index: 4;
+  padding: 9px 16px;
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--gold-light);
+  background: rgba(13, 11, 9, 0.45);
+  border: 1px solid rgba(194, 163, 107, 0.3);
+  border-radius: 999px;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.skip:hover {
+  background: rgba(194, 163, 107, 0.18);
+  border-color: var(--gold);
+}
+
+.in-details .chrome-bottom {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Never let film words sit over the invitation details. */
+.in-details .film-text {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* ---------------------------------------------------------------- loader */
+
+/* The cover is a length of maroon Kanchipuram silk: a fine weave, a slow sheen, and a gold
+   temple (gopuram) border woven along the top and bottom. Opening the invitation swings it
+   open down the middle like a pair of temple doors, revealing the film behind. */
+:root {
+  --zari-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='22' viewBox='0 0 24 22' fill='%23c9a86a'%3E%3Crect width='24' height='2'/%3E%3Crect y='4' width='24' height='.8'/%3E%3Cpath d='M2 7h20v3H2zm4 3h12v3H6zm3.5 3h5v3h-5z'/%3E%3Ccircle cx='12' cy='18.6' r='1.3'/%3E%3C/svg%3E");
+  --zari-bottom: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='22' viewBox='0 0 24 22' fill='%23c9a86a'%3E%3Crect y='20' width='24' height='2'/%3E%3Crect y='17.2' width='24' height='.8'/%3E%3Cpath d='M2 12h20v3H2zm4-3h12v3H6zm3.5-3h5v3h-5z'/%3E%3Ccircle cx='12' cy='3.4' r='1.3'/%3E%3C/svg%3E");
+  --door-open: 1.5s;
+}
+
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1300px;
+  touch-action: none;
+  transition: visibility 0s calc(var(--door-open) + 0.35s);
+}
+
+.is-ready #loader {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Each door carries its half of the silk. Tiled layers are anchored at the seam so the
+   pattern runs straight across it; the glow is one gradient split across both doors. */
+.door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background:
+    var(--zari-top) var(--seam) 0 top calc(var(--safe-top) + 14px) / 24px 22px repeat-x,
+    var(--zari-bottom) var(--seam) 0 bottom calc(var(--safe-bottom) + 14px) / 24px 22px repeat-x,
+    linear-gradient(90deg, rgba(255, 214, 170, 0.035) 1px, transparent 1px) var(--seam) top / 3px 3px,
+    linear-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 1px) var(--seam) top / 3px 3px,
+    radial-gradient(ellipse at 50% 40%, #5e1625 0%, #4a111d 45%, var(--bg) 100%) var(--half) top / 200% 100% no-repeat;
+  backface-visibility: hidden;
+  transition: transform var(--door-open) cubic-bezier(0.55, 0.05, 0.25, 1) 0.25s;
+}
+
+.door-l {
+  --seam: right;
+  --half: left;
+  left: 0;
+  transform-origin: left center;
+}
+
+.door-r {
+  --seam: left;
+  --half: right;
+  right: 0;
+  transform-origin: right center;
+}
+
+/* Doors darken as they turn away from the light. */
+.door::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(24, 5, 10, 0.6);
+  opacity: 0;
+  transition: opacity var(--door-open) ease 0.25s;
+}
+
+.is-ready .door-l { transform: rotateY(86deg); }
+.is-ready .door-r { transform: rotateY(-86deg); }
+.is-ready .door::after { opacity: 1; }
+
+/* Warm light spilling through the seam as the doors part. */
+.door-seam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: linear-gradient(to bottom, rgba(255, 222, 160, 0), rgba(255, 232, 186, 0.95) 25%, #fff3d6 50%, rgba(255, 232, 186, 0.95) 75%, rgba(255, 222, 160, 0));
+  box-shadow: 0 0 22px 6px rgba(255, 196, 120, 0.45);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.is-ready .door-seam {
+  animation: seam-light 1.3s ease-out forwards;
+}
+
+@keyframes seam-light {
+  0% { opacity: 0; transform: scaleY(0.2); }
+  22% { opacity: 1; transform: scaleY(1); }
+  55% { opacity: 0.6; transform: scaleX(12); }
+  100% { opacity: 0; transform: scaleX(20); }
+}
+
+/* A slow band of light drifting across the silk. */
+.cover-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, rgba(255, 226, 186, 0) 38%, rgba(255, 226, 186, 0.07) 50%, rgba(255, 226, 186, 0) 62%) 120% 0 / 260% 100% no-repeat;
+  animation: sheen 9s ease-in-out infinite;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.is-ready .cover-sheen {
+  opacity: 0;
+}
+
+@keyframes sheen {
+  0% { background-position: 120% 0; }
+  60%, 100% { background-position: -20% 0; }
+}
+
+.cover-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 0 24px;
+  text-align: center;
+  transition: opacity 0.5s ease, transform 1.1s cubic-bezier(0.3, 0.1, 0.3, 1);
+}
+
+/* On open the words drift forward and fade - the names never split with the doors. */
+.is-ready .cover-content {
+  opacity: 0;
+  transform: scale(1.08);
+}
+
+.cover-eyebrow {
+  font-size: 0.66rem;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The couple's calligraphy in gold leaf: the artwork is a mask over a moving gold
+   gradient, and it writes itself in from left to right when the page opens. */
+.cover-logo {
+  width: min(76vw, 400px);
+  aspect-ratio: 1200 / 855;
+  filter: drop-shadow(0 2px 10px rgba(20, 3, 8, 0.45));
+  -webkit-mask-image: linear-gradient(100deg, #000 45%, transparent 55%);
+  mask-image: linear-gradient(100deg, #000 45%, transparent 55%);
+  -webkit-mask-size: 260% 100%;
+  mask-size: 260% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+}
+
+.logo-in .cover-logo {
+  animation: write-in 2.6s cubic-bezier(0.45, 0.05, 0.3, 1) 0.2s forwards;
+}
+
+@keyframes write-in {
+  to {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+}
+
+.cover-logo i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(110deg, #a8803f 0%, #e8d3a0 18%, #c9a35e 34%, #fff1c9 46%, #c9a35e 58%, #e2c88f 76%, #a37a3c 100%) 0 0 / 300% 100%;
+  -webkit-mask: url('/assets/logo/ashwin-snegha.webp') center / contain no-repeat;
+  mask: url('/assets/logo/ashwin-snegha.webp') center / contain no-repeat;
+  animation: gold-leaf 7s ease-in-out infinite;
+}
+
+@keyframes gold-leaf {
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 100% 0; }
+}
+
+/* Hairlines with a small diamond, like a woven zari line. */
+.cover-rule {
+  position: relative;
+  width: 120px;
+  height: 8px;
+  margin-top: -4px;
+  background:
+    linear-gradient(rgba(194, 163, 107, 0.6), rgba(194, 163, 107, 0.6)) left center / 50px 1px no-repeat,
+    linear-gradient(rgba(194, 163, 107, 0.6), rgba(194, 163, 107, 0.6)) right center / 50px 1px no-repeat;
+}
+
+.cover-rule::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  background: var(--gold-light);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.cover-date {
+  margin-top: -6px;
+  font-size: 0.66rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+.cover-action {
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  margin-top: 6px;
+}
+
+.cover-action > * {
+  grid-area: 1 / 1;
+}
+
+.loader-track {
+  width: 120px;
+  height: 1px;
+  background: rgba(194, 163, 107, 0.2);
+  overflow: hidden;
+  transition: opacity 0.4s ease;
+}
+
+.loader-fill {
+  height: 100%;
+  background: var(--gold);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.4s ease-out;
+}
+
+.can-open .loader-track {
+  opacity: 0;
+}
+
+/* The cover becomes the "Open invitation" tap once the film is ready. */
+html.locked,
+html.locked body {
+  overflow: hidden;
+}
+
+.can-open #loader {
+  cursor: pointer;
+}
+
+/* "Open invitation": a maroon silk button with a double zari edge, gold lettering that
+   catches the light, and a ring that ripples out to invite the tap. */
+.cover-open {
+  position: relative;
+  padding: 15px 34px 14px;
+  font-family: var(--serif);
+  font-size: 1.12rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #f1dfb4;
+  background: linear-gradient(180deg, #6d1b2b 0%, #4c1120 100%);
+  border: 1px solid rgba(228, 212, 177, 0.75);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 0 3px #4c1120,
+    inset 0 0 0 4px rgba(194, 163, 107, 0.6),
+    0 8px 26px rgba(20, 3, 8, 0.5);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity 0.7s ease 0.15s, transform 0.7s ease 0.15s, visibility 0s 0.15s, filter 0.3s ease;
+}
+
+.can-open .cover-open {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.cover-open span {
+  background: linear-gradient(100deg, #e6cf9c 40%, #fff7e0 50%, #e6cf9c 60%) 100% 0 / 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: letter-shine 3.6s ease-in-out 1.2s infinite;
+}
+
+@keyframes letter-shine {
+  0% { background-position: 100% 0; }
+  45%, 100% { background-position: 0 0; }
+}
+
+.cover-open::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid rgba(228, 212, 177, 0.7);
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.can-open .cover-open::before {
+  animation: ripple 2.8s ease-out 1s infinite;
+}
+
+@keyframes ripple {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.14, 1.5); }
+}
+
+.cover-open:hover,
+.cover-open:focus-visible {
+  filter: brightness(1.18);
+  outline: none;
+}
+
+.cover-open:active {
+  transform: scale(0.97);
+}
+
+.cover-hint {
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  color: rgba(245, 241, 235, 0.5);
+  opacity: 0;
+  transition: opacity 0.7s ease 0.4s;
+}
+
+.can-open .cover-hint {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------- details */
+
+#details {
+  position: relative;
+  z-index: 2;
+  padding-top: 42vh;
+  /* The last frame of the film stays visible and darkens as the invitation rises. */
+  background: linear-gradient(to bottom, rgba(62, 13, 22, 0), rgba(62, 13, 22, 0.78) 22vh, var(--bg) 42vh);
+}
+
+.details-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 24px calc(14vh + var(--safe-bottom));
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 22px;
+}
+
+.invite-names {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(3rem, 13vw, 5.8rem);
+  line-height: 1;
+  color: var(--gold-light);
+}
+
+.invite-names em {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.6em;
+  color: var(--gold);
+}
+
+.invite-line {
+  margin: 22px auto 0;
+  max-width: 22em;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--muted);
+}
+
+.invite-date {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 18px;
+  max-width: 420px;
+  margin: 40px auto 18px;
+}
+
+.invite-dow,
+.invite-month {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+  font-size: 0.72rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+
+.invite-day {
+  align-self: center;
+  font-family: var(--serif);
+  font-size: 4.6rem;
+  line-height: 1;
+  color: var(--gold-light);
+}
+
+.invite-time {
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+
+.invite-venue {
+  margin-top: 26px;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  color: var(--stone);
+}
+
+.invite-venue span {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 148px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-gold {
+  background: var(--gold);
+  color: #2a1d14;
+}
+
+.btn-gold:hover {
+  background: var(--gold-light);
+}
+
+.btn-ghost {
+  border: 1px solid rgba(228, 212, 177, 0.38);
+  color: var(--gold-light);
+}
+
+.btn-ghost:hover {
+  border-color: var(--gold);
+}
+
+.ornament {
+  display: block;
+  width: 120px;
+  height: 12px;
+  margin: 84px auto;
+  color: var(--gold);
+  opacity: 0.6;
+}
+
+/* events */
+
+.event-list {
+  list-style: none;
+  text-align: left;
+}
+
+.event {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 22px;
+  padding: 26px 0;
+  border-bottom: 1px solid rgba(194, 163, 107, 0.14);
+}
+
+.event:first-child {
+  border-top: 1px solid rgba(194, 163, 107, 0.14);
+}
+
+.event-date {
+  text-align: center;
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.event-date span {
+  display: block;
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--gold-light);
+  margin-bottom: 4px;
+}
+
+.event-info h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.6rem;
+  line-height: 1.15;
+  color: var(--stone);
+}
+
+.event-meta {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+}
+
+.event-desc {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* families */
+
+.family-grid {
+  display: grid;
+  gap: 64px;
+}
+
+@media (min-width: 640px) {
+  .family-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+}
+
+.family-arch {
+  width: min(220px, 62vw);
+  aspect-ratio: 3 / 4;
+  margin: 0 auto 26px;
+  border-radius: 999px 999px 14px 14px;
+  overflow: hidden;
+  border: 1px solid rgba(194, 163, 107, 0.35);
+  padding: 6px;
+}
+
+.family-arch img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 999px 999px 10px 10px;
+  display: block;
+}
+
+.family h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.8rem;
+  color: var(--stone);
+}
+
+.family-sub {
+  margin-top: 4px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+.family ul {
+  list-style: none;
+  margin-top: 20px;
+  display: grid;
+  gap: 14px;
+}
+
+.family li span {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--stone);
+}
+
+.family li em {
+  display: block;
+  margin-top: 3px;
+  font-style: normal;
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* venue + closing */
+
+.venue h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 2rem;
+  line-height: 1.15;
+  color: var(--stone);
+}
+
+.venue-address {
+  margin: 14px auto 28px;
+  max-width: 26em;
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.closing {
+  margin-top: 110px;
+}
+
+.closing-quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.7rem, 6.5vw, 2.5rem);
+  line-height: 1.25;
+  color: var(--gold-light);
+}
+
+.closing-text {
+  margin: 22px auto 34px;
+  max-width: 24em;
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.closing-mono {
+  margin-top: 70px;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  letter-spacing: 0.32em;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+/* scroll-in */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 1s ease, transform 1s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    transform: none;
+  }
+  .ov-cue i,
+  .cover-sheen,
+  .cover-logo i,
+  .cover-open span,
+  .can-open .cover-open::before,
+  .music-btn[aria-pressed='true'] .music-bars i {
+    animation: none;
+  }
+  /* No writing-in or swinging doors: the logo is simply there, and the cover fades. */
+  .cover-logo,
+  .logo-in .cover-logo {
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation: none;
+  }
+  .door-seam {
+    display: none;
+  }
+  #loader {
+    transition: opacity 0.9s ease, visibility 0s 0.9s;
+  }
+  .is-ready #loader {
+    opacity: 0;
+  }
+  .is-ready .door-l,
+  .is-ready .door-r,
+  .is-ready .cover-content {
+    transform: none;
+  }
+}
