@@ -1,9 +1,16 @@
 /**
- * DetailsSection - the invitation itself (date, events, families, venue, RSVP), shown
+ * DetailsSection - the invitation itself (date, events, families, venue), shown
  * after the film. Everything comes from weddingData.js.
  */
 
-const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const esc = (s) =>
+  String(s).replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
 
 function parseCompact(s) {
   // "20261126T090000" -> Date
@@ -13,17 +20,17 @@ function parseCompact(s) {
 function splitDate(text) {
   // "November 24, 2026" -> { day: "24", mon: "Nov" }
   const m = /^([A-Za-z]+)\s+(\d{1,2})/.exec(text);
-  return m ? { day: m[2], mon: m[1].slice(0, 3) } : { day: '', mon: text };
+  return m ? { day: m[2], mon: m[1].slice(0, 3) } : { day: "", mon: text };
 }
 
 function calendarUrl(c) {
   const q = new URLSearchParams({
-    action: 'TEMPLATE',
+    action: "TEMPLATE",
     text: c.title,
     dates: `${c.startDate}/${c.endDate}`,
     details: c.description,
     location: c.location,
-    ctz: 'Asia/Kolkata'
+    ctz: "Asia/Kolkata",
   });
   return `https://calendar.google.com/calendar/render?${q}`;
 }
@@ -37,16 +44,19 @@ const ornament = `
 export function renderDetails(root, data) {
   const { bride, groom, couple, wedding, functions, families } = data;
   const day = parseCompact(wedding.calendarDetails.startDate);
-  const weekday = day.toLocaleDateString('en-US', { weekday: 'long' });
-  const month = day.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const weekday = day.toLocaleDateString("en-US", { weekday: "long" });
+  const month = day.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
 
   const family = (f, person) => `
     <article class="family reveal">
-      <div class="family-arch"><img src="${esc(person.photo)}" alt="${esc(person.fullName)}" loading="lazy" decoding="async"></div>
+      <div class="family-arch"><img src="${esc(f.photo || person.photo)}" alt="${esc(f.title || person.fullName)}" loading="lazy" decoding="async"></div>
       <h3>${esc(f.title)}</h3>
       <p class="family-sub">${esc(f.subtitle)}</p>
       <ul>
-        ${f.members.map((m) => `<li><span>${esc(m.name)}</span><em>${esc(m.relation)}</em></li>`).join('')}
+        ${f.members.map((m) => `<li><span>${esc(m.name)}</span></li>`).join("")}
       </ul>
     </article>`;
 
@@ -54,18 +64,27 @@ export function renderDetails(root, data) {
     <div class="details-inner">
       <header class="invite reveal">
         <p class="eyebrow">Together with their families</p>
-        <h2 class="invite-names">${esc(bride.name)} <em>&amp;</em> ${esc(groom.name)}</h2>
-        <p class="invite-line">request the joy of your presence at their wedding</p>
-        <div class="invite-date">
-          <span class="invite-dow">${esc(weekday)}</span>
-          <span class="invite-day">${day.getDate()}</span>
-          <span class="invite-month">${esc(month)}</span>
+        <h2 class="invite-names">${esc(groom.name)} <em>&amp;</em> ${esc(bride.name)}</h2>
+        <p class="invite-line">request the joy of your presence at their wedding celebrations</p>
+        
+        <div class="invite-dates">
+          <div class="invite-date-card">
+            <span class="card-dow">Sunday</span>
+            <span class="card-day">15</span>
+            <span class="card-tag">Reception</span>
+          </div>
+          <span class="invite-date-amp" aria-hidden="true">&amp;</span>
+          <div class="invite-date-card card-muhurtham">
+            <span class="card-dow">Monday</span>
+            <span class="card-day">16</span>
+            <span class="card-tag">Subha Muhurtham</span>
+          </div>
         </div>
-        <p class="invite-time">${esc(wedding.auspiciousTime)}</p>
-        <p class="invite-venue">${esc(wedding.venue)}<span>${esc(wedding.city)}</span></p>
+        <p class="invite-month">November 2026</p>
+
+        <p class="invite-venue">${esc(wedding.venue)}<span>${esc(wedding.address)}, ${esc(wedding.city)}</span></p>
         <div class="actions">
-          <a class="btn btn-gold" href="${esc(wedding.rsvpUrl)}" target="_blank" rel="noopener">RSVP</a>
-          <a class="btn btn-ghost" href="${esc(calendarUrl(wedding.calendarDetails))}" target="_blank" rel="noopener">Add to calendar</a>
+          <a class="btn btn-gold" href="${esc(calendarUrl(wedding.calendarDetails))}" target="_blank" rel="noopener">Add to calendar</a>
         </div>
       </header>
 
@@ -74,18 +93,20 @@ export function renderDetails(root, data) {
       <section class="events">
         <p class="eyebrow reveal">The celebrations</p>
         <ol class="event-list">
-          ${functions.map((fn) => {
-            const d = splitDate(fn.date);
-            return `
+          ${functions
+            .map((fn) => {
+              const d = splitDate(fn.date);
+              return `
             <li class="event reveal">
               <div class="event-date"><span>${esc(d.day)}</span>${esc(d.mon)}</div>
               <div class="event-info">
                 <h3>${esc(fn.title)}</h3>
-                <p class="event-meta">${esc(fn.time)} · ${esc(fn.venue)}</p>
+                <p class="event-meta">${esc(fn.time)}</p>
                 <p class="event-desc">${esc(fn.description)}</p>
               </div>
             </li>`;
-          }).join('')}
+            })
+            .join("")}
         </ol>
       </section>
 
@@ -111,19 +132,21 @@ export function renderDetails(root, data) {
       <footer class="closing reveal">
         <p class="closing-quote">${esc(couple.closingHeadline)}<br>${esc(couple.closingSubhead)}</p>
         <p class="closing-text">${esc(couple.invitationMessage)}</p>
-        <a class="btn btn-gold" href="${esc(wedding.rsvpUrl)}" target="_blank" rel="noopener">RSVP</a>
         <p class="closing-mono">${esc(couple.monogram)}</p>
       </footer>
     </div>`;
 
   // Gentle fade-up as each block scrolls into view.
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (e.isIntersecting) {
-        e.target.classList.add('is-in');
-        io.unobserve(e.target);
-      }
-    });
-  }, { rootMargin: '0px 0px -8% 0px' });
-  root.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add("is-in");
+          io.unobserve(e.target);
+        }
+      });
+    },
+    { rootMargin: "0px 0px -8% 0px" },
+  );
+  root.querySelectorAll(".reveal").forEach((el) => io.observe(el));
 }

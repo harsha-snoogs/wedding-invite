@@ -5,17 +5,18 @@
 export const weddingData = {
   bride: {
     name: "Snegha",
-    fullName: "Snegha Ramachandran",
+    fullName: "Snegha",
     photo: "/assets/couple/sneha-solo.jpg",
   },
   groom: {
     name: "Ashwin",
-    fullName: "Ashwin Kumar",
+    fullName: "Ashwin",
     photo: "/assets/couple/ashwin-solo.jpg",
   },
   music: {
     // Your song, looping softly in the background. Put the file in public/assets/audio/.
     // Leave src empty to have no music (the music button then hides itself).
+    // src: "/assets/audio/seele.MP3",
     src: "/assets/audio/love_bug_has_bitten_cut.MP3",
     // Optional: 0-1 to play it quieter (iPhones ignore this and play at full level).
     // volume: 0.8,
@@ -38,7 +39,7 @@ export const weddingData = {
     },
     {
       frame: "03-face-other",
-      label: "Face to face",
+      label: "In Your Eyes 🤍",
       text: "Then came the glances that said what words couldn't.",
     },
     // Used only if the walking photo (backup) goes back into the film.
@@ -51,78 +52,76 @@ export const weddingData = {
   // Shown above your names in the last scene, as the camera pulls back.
   finaleLine: "Two paths, one journey",
   wedding: {
-    date: "November 26, 2026",
-    auspiciousTime: "Muhurtham: 9:15 AM - 10:15 AM",
-    venue: "Sri Ramachandra Convention Hall",
-    city: "Chennai, Tamil Nadu",
-    address:
-      "No. 45, Grand Trunk Road, Anna Nagar, Chennai, Tamil Nadu - 600040",
-    googleMapsUrl:
-      "https://maps.google.com/?q=Sri+Ramachandra+Convention+Hall+Chennai",
-    rsvpUrl: "https://forms.gle/wedding-rsvp-placeholder",
+    date: "November 15 & 16 - 2026",
+    auspiciousTime: "Muhurtham: 06:35 AM - 07:15 AM",
+    venue: "Sri Vasavi Mithra Mahal",
+    city: "Coimbatore",
+    address: "Royal Iswaryam hall, Perur road, Telungupalayam",
+    googleMapsUrl: "https://maps.app.goo.gl/sh1sDH243gJYEbyB8",
     calendarDetails: {
       title: "Snegha & Ashwin Wedding",
       description: "Join us to celebrate the wedding of Snegha and Ashwin!",
-      location: "Sri Ramachandra Convention Hall, Chennai",
-      startDate: "20261126T090000",
-      endDate: "20261126T120000",
+      location: "Sri Vasavi Mithra Mahal, Coimbatore",
+      startDate: "20261115T000000",
+      endDate: "20261116T235959",
     },
   },
   functions: [
     {
-      title: "Mehendi Ceremony",
-      date: "November 24, 2026",
-      time: "4:00 PM onwards",
-      venue: "Garden Pavilion, Chennai",
+      title: "Welcome",
+      date: "November 15, 2026",
+      time: "08:30 AM",
       description:
-        "An afternoon of henna, laughter, music, and colorful celebrations.",
+        "A heartfelt welcome to the groom’s family as both families come together to celebrate love, joy, and new beginnings.",
     },
     {
-      title: "Sangeet & Cocktail Night",
-      date: "November 25, 2026",
-      time: "7:00 PM onwards",
-      venue: "The Grand Ballroom, Chennai",
+      title: "Nitchayathartham",
+      date: "November 15, 2026",
+      time: "11:00 AM",
       description:
-        "An evening of dance performances, music, and joyous festivities.",
+        "A beautiful promise of togetherness, as two families unite to bless a new beginning.",
     },
     {
-      title: "Holy Muhurtham",
-      date: "November 26, 2026",
-      time: "9:00 AM - 11:30 AM",
-      venue: "Sri Ramachandra Convention Hall",
+      title: "Reception",
+      date: "November 15, 2026",
+      time: "06:30 PM",
       description:
-        "The sacred traditional ceremony binding two hearts into one.",
+        "An evening of elegance and celebration, sharing our happiness with the people we love.",
     },
     {
-      title: "Grand Reception",
-      date: "November 26, 2026",
-      time: "6:30 PM onwards",
-      venue: "Sri Ramachandra Grand Lawn",
+      title: "Upanayanam",
+      date: "November 16, 2026",
+      time: "04:00 AM - 05:00 AM",
       description:
-        "Dinner, toasts, and celebrating our new beginning with loved ones.",
+        "A sacred rite of passage, marking the beginning of a spiritual journey filled with wisdom and blessings.",
+    },
+    {
+      title: "Subha Muhurtham",
+      date: "November 16, 2026",
+      time: "06:35 AM to 07:15 AM",
+      description:
+        "A sacred union blessed with love, happiness, and a lifetime of beautiful tomorrows.",
     },
   ],
   families: {
     bride: {
       title: "Snegha's Family",
       subtitle: "Welcoming you with warmth and love",
+      photo: "/assets/family/bride-family.jpg",
       members: [
         {
-          name: "Smt. Lakshmi & Sri Ramachandran",
-          relation: "Parents of the Bride",
+          name: "Smt. M.Yogalakshmi & Sri. V.Muralidharan",
         },
-        { name: "Ananya Ramachandran", relation: "Sister" },
       ],
     },
     groom: {
       title: "Ashwin's Family",
       subtitle: "Two families becoming one shared journey",
+      photo: "/assets/family/groom-family.jpg",
       members: [
         {
-          name: "Smt. Radhika & Sri Suresh Kumar",
-          relation: "Parents of the Groom",
+          name: "Smt. S.Kalpana & Sri. D.Sampathkumar",
         },
-        { name: "Karthik Kumar", relation: "Brother" },
       ],
     },
   },

@@ -44,9 +44,9 @@ export const LINKS = [
 
 // Holds: `push` scales gently about the next subject; `at`/`z` reframe deliberately.
 const HOLDS = [
-  { len: 0.7, push: 1.06, at: [0.53, 0.8] },      // opening - drifting down towards their hands
+  { len: 0.5, push: 1.06, at: [0.53, 0.8] },      // opening - drifting down towards their hands
   { len: 0.6 },                                   // hands
-  { len: 1.8, at: [0.5, 0.9], z: 1.0 }            // face to face - pull back until both faces are in; names appear
+  { len: 2.8, at: [0.5, 0.9], z: 1.0 }            // face to face - pull back until both faces are in; names appear
 ];
 
 // Backup third shot (walking down the path; files in source-photos/backup/film/). To switch
@@ -56,7 +56,7 @@ const HOLDS = [
 const DEFAULT_PUSH = 1.025;
 
 // Link lengths in units, set so each transition moves at the same pace (see motion check).
-const LINK = [1.6, 1.7];
+const LINK = [1.25, 1.7];
 
 export const UNIT_VH = 62;
 
