@@ -87,6 +87,7 @@ const overlays = [
   // shade: which screen edge the text's shading darkens, and how strongly (for BrowserTint)
   { el: document.getElementById('ov-title'), out: [0.08, 0.42], shade: ['top', 0.66] },
   { el: document.getElementById('ov-cue'), out: [0.02, 0.22] },
+  { el: document.getElementById('to-top'), in: [0.5, 0.85] },
   { el: document.getElementById('ov-wed'), in: [finaleSplit + 0.05, finaleSplit + 0.4], out: [TOTAL_UNITS - 0.45, TOTAL_UNITS - 0.05], shade: ['top', 0.55] },
   { el: document.getElementById('ov-cue-finale'), in: [finaleSplit + 0.33, finaleSplit + 0.4], out: [TOTAL_UNITS - 0.5, TOTAL_UNITS - 0.1] }
 ];

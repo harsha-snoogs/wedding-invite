@@ -26,10 +26,20 @@ This digital invitation bridges traditional South Indian ceremony with cutting-e
    - Designed with older guests and hands-free phone viewing in mind.
    - If a guest doesn't scroll immediately, an intelligent auto-glide gently guides them through the photographic journey, pauses comfortably at story notes, and lands at the couple's finale before smoothly gliding to event details.
 
-4. **The Sacred Invitation & Itinerary**
-   - **Dual-Day Clarity**: Clearly distinguishes between **Sunday, Nov 15** _(Welcome, Nitchayathartham & Grand Reception)_ and **Monday, Nov 16** _(Auspicious Subha Muhurtham: 06:35 AM – 07:15 AM)_.
-   - **Family Blessings**: Elegant arched portraits honoring both the bride's and groom's families.
-   - **Guest Utility**: One-tap _"Add to Calendar"_ and Google Maps venue navigation for seamless arrival.
+4. **Luxury Celebration Cards (Slow 3D Perspective Reveal)**
+   - Translucent glassmorphic ceremony cards with authentic South Indian motifs (Diya, Rings, Chandelier, Sacred Thread, and Sacred Thali/Kalasam).
+   - **Mild Occasion Backgrounds**: Each card is layered with a subtle, occasion-themed atmospheric background image (marigold & jasmine entrance, betrothal filigree, evening reception chandelier bokeh, Vedic homam sacred fire, and traditional temple mandap) blended softly with a dark radial vignette for optimal text legibility.
+   - Slow, silky scroll-triggered perspective transition (`rotateX`, `translateY`, and staggered delays) referencing modern luxury invitations.
+   - Special regal golden highlight for the **Subha Muhurtham** ceremony.
+
+5. **"Postcards from Coimbatore" (Interactive City Guide)**
+   - Horizontally scrollable postcard gallery showcasing scenic landmarks & sacred destinations around Coimbatore: *Perur Pateeswarar Temple (3.5 km away), Adiyogi Shiva & Isha Yoga, Marudhamalai Hill Temple, Valparai Tea Hills, Siruvani Waterfalls, and Aliyar Dam*.
+   - Vintage postal stamp styling with interactive tap discovery modals featuring rich history, distance from venue, and direct Google Maps navigation.
+
+6. **The Sacred Invitation & Family Blessings**
+   - **Dual-Day Clarity**: Prominently separates **Sunday, Nov 15** *(Welcome, Nitchayathartham & Grand Reception)* and **Monday, Nov 16** *(Auspicious Subha Muhurtham: 06:35 AM – 07:15 AM)*.
+   - **Family Blessings**: Arched portraits honoring both the bride's and groom's families.
+   - **Guest Utility**: One-tap *"Add to Calendar"* and Google Maps venue navigation for seamless arrival.
 
 ---
 
@@ -40,10 +50,12 @@ wedding-invite-3/
 ├── public/
 │   ├── assets/
 │   │   ├── audio/          # Background soundtrack ("Love Bug Has Bitten")
+│   │   ├── coimbatore/     # Scenic postcard photography for Coimbatore destinations
 │   │   ├── couple/         # Bride & Groom portraits
 │   │   ├── family/         # Arched family portraits (bride & groom)
 │   │   ├── film/           # High-fidelity AVIF & JPG responsive film frames
-│   │   └── logo/           # Handcrafted couple calligraphy (WebP)
+│   │   ├── logo/           # Handcrafted couple calligraphy (WebP)
+│   │   └── occasions/      # Atmospheric backdrop imagery for each ceremony card
 │   ├── preview.jpg         # WhatsApp / iMessage Open Graph social card
 │   └── assets/save-the-date-preview.jpg
 ├── src/

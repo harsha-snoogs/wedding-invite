@@ -242,24 +242,38 @@ main {
 }
 
 .ov-cue {
-  bottom: calc(var(--safe-bottom) + 40px);
+  bottom: calc(var(--safe-bottom) + 38px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  font-size: 0.64rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: rgba(245, 241, 235, 0.8);
   pointer-events: auto;
   cursor: pointer;
+  padding: 8px 20px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse 90% 70% at center, rgba(16, 7, 12, 0.55) 0%, rgba(16, 7, 12, 0) 75%);
+}
+
+.ov-cue span {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.95),
+    0 1px 4px rgba(0, 0, 0, 0.95),
+    0 0 16px rgba(255, 235, 180, 0.5);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.9));
 }
 
 .ov-cue i {
   display: block;
-  width: 1px;
-  height: 42px;
-  background: linear-gradient(to bottom, rgba(228, 212, 177, 0), rgba(228, 212, 177, 0.9));
+  width: 1.5px;
+  height: 44px;
+  background: linear-gradient(to bottom, rgba(255, 245, 220, 0.1), rgba(255, 245, 220, 1));
+  box-shadow: 0 0 10px rgba(255, 230, 160, 0.85);
   transform-origin: top;
   animation: cue 2.2s cubic-bezier(0.6, 0, 0.3, 1) infinite;
 }
@@ -289,6 +303,7 @@ main {
 }
 
 .music-btn {
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -356,6 +371,15 @@ main {
   color: var(--gold-light);
   text-decoration: none;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease;
+}
+
+.in-details .chrome-top .mono {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none;
 }
 
 .chrome-bottom {
@@ -1003,64 +1027,802 @@ html.locked body {
   opacity: 0.6;
 }
 
-/* events */
+/* events / celebrations cards */
 
-.event-list {
-  list-style: none;
+.events-section {
+  margin: 30px auto 0;
+  max-width: 680px;
+}
+
+.events-section-title {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  font-weight: 500;
+  color: var(--gold-light);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.events-section-subtitle {
+  font-size: 0.92rem;
+  color: var(--muted);
+  font-weight: 300;
+  max-width: 28em;
+  margin: 0 auto 36px;
+  line-height: 1.55;
+}
+
+.ceremony-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+@media (min-width: 640px) {
+  .ceremony-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  .is-muhurtham-card {
+    grid-column: 1 / -1;
+  }
+}
+
+.ceremony-card {
+  position: relative;
+  border-radius: 20px;
+  text-align: center;
+  /* Slow silky entrance transition referencing MyShaadhiLink */
+  opacity: 0;
+  transform: perspective(1000px) translateY(45px) rotateX(10deg);
+  transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--card-index, 0) * 120ms);
+  will-change: transform, opacity;
+}
+
+.ceremony-card.is-revealed {
+  opacity: 1;
+  transform: perspective(1000px) translateY(0) rotateX(0deg);
+}
+
+.card-glass {
+  position: relative;
+  background: rgba(30, 16, 22, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(194, 163, 107, 0.28);
+  border-radius: 20px;
+  padding: 26px 22px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(228, 212, 177, 0.16);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+  overflow: hidden;
+}
+
+.ceremony-card:hover .card-glass {
+  border-color: rgba(228, 212, 177, 0.55);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.55), 0 0 20px rgba(194, 163, 107, 0.14);
+  transform: translateY(-2px);
+}
+
+/* Mild occasion-specific background image layer */
+.card-bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.card-bg-layer img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.38;
+  filter: saturate(1.18) contrast(1.08);
+  transform: scale(1.04);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+.ceremony-card:hover .card-bg-layer img {
+  transform: scale(1.10);
+  opacity: 0.52;
+}
+
+.card-bg-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(16, 8, 12, 0.42) 0%,
+    rgba(18, 9, 13, 0.65) 50%,
+    rgba(20, 10, 14, 0.88) 100%
+  );
+}
+
+.is-muhurtham-card .card-bg-layer img {
+  opacity: 0.46;
+  filter: saturate(1.25) contrast(1.12);
+}
+
+.is-muhurtham-card:hover .card-bg-layer img {
+  opacity: 0.60;
+}
+
+.card-header-bar,
+.card-motif-circle,
+.card-event-title,
+.card-event-desc,
+.card-crown-badge {
+  position: relative;
+  z-index: 1;
+}
+
+.card-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.card-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  font-weight: 500;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+.card-time-badge {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(194, 163, 107, 0.12);
+  border: 1px solid rgba(194, 163, 107, 0.28);
+  color: #fff8e8;
+}
+
+.card-motif-circle {
+  width: 60px;
+  height: 60px;
+  margin: 6px auto 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(194, 163, 107, 0.24) 0%, rgba(20, 10, 14, 0.7) 85%);
+  border: 1.5px solid rgba(194, 163, 107, 0.42);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  transform: scale(0.65) rotate(-18deg);
+  opacity: 0;
+  transition: transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--card-index, 0) * 120ms + 180ms),
+              opacity 0.85s ease calc(var(--card-index, 0) * 120ms + 180ms);
+}
+
+.ceremony-card.is-revealed .card-motif-circle {
+  transform: scale(1) rotate(0deg);
+  opacity: 1;
+}
+
+.motif-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.motif-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card-event-title {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #fff9ee;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.card-event-desc {
+  font-size: 0.88rem;
+  line-height: 1.62;
+  color: var(--muted);
+  font-weight: 300;
+  margin: 0;
+}
+
+.card-decor-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.card-decor-tl {
+  top: 8px;
+  left: 8px;
+  border-top: 1px solid var(--gold);
+  border-left: 1px solid var(--gold);
+}
+
+.card-decor-br {
+  bottom: 8px;
+  right: 8px;
+  border-bottom: 1px solid var(--gold);
+  border-right: 1px solid var(--gold);
+}
+
+/* Subha Muhurtham Highlight */
+.is-muhurtham-card .card-glass {
+  background: linear-gradient(145deg, rgba(48, 22, 28, 0.85) 0%, rgba(26, 12, 16, 0.92) 100%);
+  border-color: rgba(228, 212, 177, 0.65);
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.6), 0 0 28px rgba(201, 168, 106, 0.22), inset 0 1px 0 rgba(255, 245, 220, 0.32);
+}
+
+.card-crown-badge {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2b180d;
+  background: linear-gradient(90deg, #d4af37, #fef1cf, #d4af37);
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin: -10px auto 14px;
+  box-shadow: 0 4px 12px rgba(201, 168, 106, 0.35);
+}
+
+.is-muhurtham-card .card-motif-circle {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 20px rgba(201, 168, 106, 0.32);
+}
+
+.is-muhurtham-card .card-event-title {
+  color: #fffbf2;
+}
+
+/* ---------------------------------------------------------------- postcards */
+
+.postcards-section {
+  margin: 90px auto 0;
+  max-width: 100%;
+}
+
+.postcards-title {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 6vw, 2.6rem);
+  font-weight: 500;
+  color: var(--gold-light);
+  line-height: 1.2;
+}
+
+.postcards-subtitle {
+  font-size: 0.92rem;
+  color: var(--muted);
+  font-weight: 300;
+  max-width: 28em;
+  margin: 6px auto 32px;
+  line-height: 1.55;
+}
+
+.postcard-rail-wrapper {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  overflow: hidden;
+}
+
+.postcard-rail {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 10px 24px 28px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.postcard-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.postcard-card {
+  flex: 0 0 280px;
+  max-width: 82vw;
+  scroll-snap-align: center;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #231219;
+  border: 1px solid rgba(194, 163, 107, 0.32);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.48);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s ease,
+              box-shadow 0.4s ease;
+  user-select: none;
+}
+
+.postcard-card:hover,
+.postcard-card:focus-visible {
+  transform: translateY(-6px);
+  border-color: var(--gold-light);
+  box-shadow: 0 22px 42px rgba(0, 0, 0, 0.65), 0 0 22px rgba(194, 163, 107, 0.22);
+  outline: none;
+}
+
+.postcard-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.postcard-stamp {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  background: rgba(26, 12, 16, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px dashed rgba(228, 212, 177, 0.65);
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.stamp-pin {
+  font-family: var(--sans);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+.stamp-city {
+  font-family: var(--serif);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--gold-light);
+}
+
+.postcard-photo-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #140b0e;
+}
+
+.postcard-photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.postcard-card:hover .postcard-photo-wrap img {
+  transform: scale(1.06);
+}
+
+.postcard-dist-pill {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 2;
+  font-family: var(--sans);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(16, 8, 12, 0.78);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(228, 212, 177, 0.38);
+  color: #fff6e0;
+}
+
+.postcard-caption {
+  padding: 18px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.postcard-category {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.postcard-place-title {
+  font-family: var(--serif);
+  font-size: 1.28rem;
+  font-weight: 500;
+  color: #fff9ee;
+  margin: 4px 0 6px;
+  line-height: 1.25;
+}
+
+.postcard-tagline {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.postcard-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--gold-light);
+  font-weight: 500;
+  transition: gap 0.3s ease;
+}
+
+.postcard-card:hover .postcard-cta {
+  gap: 9px;
+  color: #fff;
+}
+
+.postcard-hint {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.75;
+  margin: 6px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- modal */
+
+.postcard-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(12, 6, 9, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.postcard-modal-overlay[aria-hidden="false"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Hide top chrome (especially music button) while modal is open so it cannot intercept taps */
+body.modal-open .chrome-top {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-12px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+body.modal-open {
+  overflow: hidden;
+  touch-action: none;
+}
+
+.postcard-modal {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 88vh;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  background: #1c0c12;
+  border: 1px solid rgba(228, 212, 177, 0.45);
+  border-radius: 24px;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.8), 0 0 30px rgba(194, 163, 107, 0.18);
+  transform: translateY(24px) scale(0.96);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: left;
 }
 
-.event {
-  display: grid;
-  grid-template-columns: 58px 1fr;
-  gap: 22px;
-  padding: 26px 0;
-  border-bottom: 1px solid rgba(194, 163, 107, 0.14);
+.postcard-modal-overlay[aria-hidden="false"] .postcard-modal {
+  transform: translateY(0) scale(1);
 }
 
-.event:first-child {
-  border-top: 1px solid rgba(194, 163, 107, 0.14);
+/* Drag indicator bar for swipe-down to dismiss */
+.modal-drag-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 0 6px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 }
 
-.event-date {
-  text-align: center;
+.modal-drag-bar {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(228, 212, 177, 0.5);
+  transition: background 0.2s ease, width 0.2s ease;
+}
+
+.modal-drag-area:hover .modal-drag-bar {
+  background: rgba(228, 212, 177, 0.85);
+  width: 52px;
+}
+
+.modal-drag-hint {
+  font-family: var(--sans);
+  font-size: 0.60rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  opacity: 0.6;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 25;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(20, 10, 14, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(194, 163, 107, 0.45);
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+}
+
+.modal-close-btn:hover,
+.modal-close-btn:focus-visible {
+  background: rgba(194, 163, 107, 0.3);
+  border-color: var(--gold);
+  transform: scale(1.08);
+  outline: none;
+}
+
+.modal-close-btn:active {
+  transform: scale(0.92);
+}
+
+.modal-hero-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+
+.modal-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(28, 12, 18, 0.1) 0%, rgba(28, 12, 18, 0.85) 100%);
+}
+
+.modal-category-badge {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  font-family: var(--sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff9ee;
+  background: rgba(20, 10, 14, 0.75);
+  backdrop-filter: blur(6px);
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(228, 212, 177, 0.4);
+}
+
+.modal-content {
+  padding: 24px 24px 28px;
+}
+
+.modal-header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.modal-distance-pill,
+.modal-time-pill {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  color: var(--gold-light);
+  background: rgba(194, 163, 107, 0.12);
+  border: 1px solid rgba(194, 163, 107, 0.25);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.modal-title {
+  font-family: var(--serif);
+  font-size: 1.85rem;
+  font-weight: 500;
+  color: #fff9ee;
+  line-height: 1.2;
+  margin: 0 0 6px;
+}
+
+.modal-tagline {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+
+.modal-desc {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--stone);
+  font-weight: 300;
+  margin-bottom: 22px;
+}
+
+.modal-highlights {
+  background: rgba(28, 14, 20, 0.65);
+  border: 1px solid rgba(194, 163, 107, 0.2);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+}
+
+.highlights-label {
+  display: block;
+  font-family: var(--sans);
   font-size: 0.66rem;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
-.event-date span {
-  display: block;
-  font-family: var(--serif);
-  font-size: 2.4rem;
-  line-height: 1;
-  letter-spacing: 0;
-  color: var(--gold-light);
-  margin-bottom: 4px;
+.highlights-list {
+  list-style: none;
+  display: grid;
+  gap: 8px;
 }
 
-.event-info h3 {
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: 1.6rem;
-  line-height: 1.15;
-  color: var(--stone);
-}
-
-.event-meta {
-  margin-top: 6px;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  color: var(--gold);
-}
-
-.event-desc {
-  margin-top: 8px;
-  font-size: 0.9rem;
-  font-weight: 300;
-  line-height: 1.6;
+.highlights-list li {
+  font-size: 0.86rem;
   color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.check-icon {
+  color: var(--gold-light);
+  font-size: 0.7rem;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.modal-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+}
+
+.modal-close-action-btn {
+  padding: 13px 22px;
+  cursor: pointer;
+  background: transparent;
+}
+
+/* Mobile Bottom Sheet Adaptation */
+@media (max-width: 640px) {
+  .postcard-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .postcard-modal {
+    max-width: 100%;
+    max-height: 86vh;
+    border-radius: 24px 24px 0 0;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.75);
+  }
+
+  .modal-hero-wrap {
+    aspect-ratio: 16 / 9;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-map-btn,
+  .modal-close-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* families */
