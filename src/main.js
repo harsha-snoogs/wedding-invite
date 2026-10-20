@@ -167,9 +167,15 @@ ready.then(() => {
   setTimeout(() => document.getElementById('cover-open').focus({ preventScroll: true }), 250);
 });
 
+let doorsOpenedTime = 0;
+
 function openInvite() {
   const body = document.body;
   if (!body.classList.contains('can-open') || body.classList.contains('is-ready')) return;
+  doorsOpenedTime = performance.now();
+  userHasInteracted = false;
+  wasAutoAdvanced = false;
+  hideDetailsCue();
   document.documentElement.classList.remove('locked');
   window.scrollTo(0, 0);
   body.classList.add('is-ready');
@@ -180,11 +186,11 @@ function openInvite() {
 document.getElementById('loader').addEventListener('click', openInvite);
 
 // --- Auto-scroll ------------------------------------------------------------------------
-// If the user doesn't scroll within 7s (6-8s window) after opening the invite, auto-scroll begins.
+// If the user doesn't scroll within ~2.8s after opening the invite, auto-scroll begins.
 // It glides through the film, giving comfortable reading time at each story note, and comes to a
 // gentle rest at "Snegha weds Ashwin" (the 3rd photo finale). Any manual interaction stops it.
 
-const AUTO_SCROLL_DELAY_MS = 7000;
+const AUTO_SCROLL_DELAY_MS = 2800;
 
 const f1Start = holdStart(1);
 const f2Start = holdStart(2);
@@ -222,6 +228,16 @@ let autoScrollTimer = null;
 let autoScrollRaf = null;
 let isAutoScrolling = false;
 let userHasInteracted = false;
+let wasAutoAdvanced = false;
+let detailsCueTimer = null;
+
+function hideDetailsCue() {
+  if (detailsCueTimer) {
+    clearTimeout(detailsCueTimer);
+    detailsCueTimer = null;
+  }
+  document.getElementById('details-cue')?.classList.remove('is-visible');
+}
 
 function stopAutoScroll() {
   if (autoScrollTimer) {
@@ -237,13 +253,12 @@ function stopAutoScroll() {
 
 let finaleAdvanceTimer = null;
 
-function scheduleFinaleAutoAdvance(delayMs = 5000) {
+function scheduleFinaleAutoAdvance(delayMs = 3000) {
   cancelFinaleAutoAdvance();
   finaleAdvanceTimer = setTimeout(() => {
-    const detailsRect = details.getBoundingClientRect();
-    if (detailsRect.top > window.innerHeight * 0.4) {
-      details.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (userHasInteracted) return;
+    wasAutoAdvanced = true;
+    details.scrollIntoView({ behavior: 'smooth' });
   }, delayMs);
 }
 
@@ -256,29 +271,23 @@ function cancelFinaleAutoAdvance() {
 
 function onUserManualInteraction(e) {
   if (!document.body.classList.contains('is-ready')) return;
-  // Ignore taps on controls like the music toggle button
-  if (e && e.target && e.target.closest && e.target.closest('#music-toggle')) return;
+  // Ignore opening interactions or controls like music button
+  if (performance.now() - doorsOpenedTime < 1500) return;
+  if (e && e.target && e.target.closest && (e.target.closest('#loader') || e.target.closest('#music-toggle'))) return;
 
   userHasInteracted = true;
   stopAutoScroll();
   cancelFinaleAutoAdvance();
+  hideDetailsCue();
 }
 
-// Listen for gestures indicating intent to scroll manually
-['wheel', 'touchstart', 'touchmove', 'pointerdown', 'keydown'].forEach((evt) => {
-  window.addEventListener(evt, onUserManualInteraction, { passive: true, capture: true });
+// Listen for genuine gestures indicating intent to scroll manually
+['wheel', 'touchmove', 'keydown'].forEach((evt) => {
+  window.addEventListener(evt, onUserManualInteraction, { passive: true });
 });
-
-window.addEventListener('scroll', () => {
-  // If user scrolled before auto-scroll triggered
-  if (!isAutoScrolling && window.scrollY > 15) {
-    onUserManualInteraction();
-  }
-}, { passive: true });
 
 function startAutoScroll() {
   if (userHasInteracted || isAutoScrolling) return;
-  if (window.scrollY > 20) return; // user already scrolled
 
   isAutoScrolling = true;
   const startTime = performance.now();
@@ -295,8 +304,7 @@ function startAutoScroll() {
 
     if (elapsedSec >= totalDurationSec) {
       stopAutoScroll();
-      userHasInteracted = true; // Complete; manual scroll takes over from here
-      scheduleFinaleAutoAdvance(4500);
+      scheduleFinaleAutoAdvance(3000);
       return;
     }
 
@@ -358,12 +366,31 @@ document.getElementById('to-top').addEventListener('click', (e) => {
 });
 
 document.getElementById('ov-cue-finale')?.addEventListener('click', () => {
-  onUserManualInteraction();
   details.scrollIntoView({ behavior: 'smooth' });
+});
+
+document.getElementById('details-cue')?.addEventListener('click', () => {
+  const celebrations = document.querySelector('.events-section') || document.querySelector('.invite');
+  celebrations?.scrollIntoView({ behavior: 'smooth' });
 });
 
 // Hide the film chrome once the invitation details take over the screen.
 new IntersectionObserver(([entry]) => {
   document.body.classList.toggle('in-details', entry.isIntersecting);
-  if (entry.isIntersecting) cancelFinaleAutoAdvance();
-}, { rootMargin: '0px 0px -55% 0px' }).observe(details);
+  const detailsCue = document.getElementById('details-cue');
+
+  if (entry.isIntersecting) {
+    cancelFinaleAutoAdvance();
+    // ONLY reveal the details scroll cue if brought here via auto-scroll and NOT manually scrolled
+    if (wasAutoAdvanced && !userHasInteracted) {
+      if (detailsCueTimer) clearTimeout(detailsCueTimer);
+      detailsCueTimer = setTimeout(() => {
+        if (wasAutoAdvanced && !userHasInteracted) {
+          detailsCue?.classList.add('is-visible');
+        }
+      }, 750);
+    }
+  } else {
+    hideDetailsCue();
+  }
+}, { rootMargin: '0px 0px -40% 0px' }).observe(details);

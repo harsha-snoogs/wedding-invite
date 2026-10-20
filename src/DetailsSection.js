@@ -131,6 +131,15 @@ export function renderDetails(root, data) {
     </article>`;
 
   root.innerHTML = `
+    <div class="details-cue" id="details-cue" role="button" tabindex="0" aria-label="Scroll for wedding details">
+      <span class="cue-arrow-up" aria-hidden="true">
+        <svg viewBox="0 0 14 8" class="cue-chevron">
+          <path d="M1 7 L7 2 L13 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <i class="cue-stem"></i>
+      </span>
+      <span>Scroll</span>
+    </div>
     <div class="details-inner">
       <header class="invite reveal">
         <p class="eyebrow">Together with their families</p>
